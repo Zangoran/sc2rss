@@ -25,13 +25,13 @@ module.exports = class Soundcloud2Podcast {
 			this.res = res;
 			this.main();
 		});
-    }
+	}
 
-	main(){
+	main() {
 		this.print(this.get_feed());
 	}
 
-	get_soundcloud_url(){
+	get_soundcloud_url() {
 		let url = this.req.query.url;
 		if (url)
 			this.url = url;
@@ -43,11 +43,11 @@ module.exports = class Soundcloud2Podcast {
 		return url;
 	}
 
-	getSoundcloudJson(url){
+	getSoundcloudJson(url) {
 		let clientId = this.getLocalClientId();
 		let res = this.getSoundcloudApi(url, clientId, false);
 
-		if (!res){
+		if (!res) {
 			this.saveRemoteClientId();
 			res = this.getSoundcloudApi(url, true);
 		}
@@ -55,28 +55,27 @@ module.exports = class Soundcloud2Podcast {
 		let json;
 		try {
 			json = JSON.parse(res.body);
-		}
-		catch(err){
+		} catch (err) {
 			console.error(err);
 			this.die('json file is wrong!');
 		}
 		return json;
 	}
 
-	getSoundcloudApi(url, dieIfFailed){
+	getSoundcloudApi(url, dieIfFailed) {
 		let apiUrl = "https://api.soundcloud.com/resolve.json?client_id=" + this.clientId + "&url=" + url;
 		let res = request('GET', apiUrl);
-		if (res.statusCode != 200){
-			 if (dieIfFailed)
+		if (res.statusCode != 200) {
+			if (dieIfFailed)
 				this.die('request to soundcloud failed!');
-		else
-			return false;
+			else
+				return false;
 		}
 
 		return res;
 	}
 
-	get_feed(){
+	get_feed() {
 		let url = this.get_soundcloud_url();
 		let cache = this.get_cache();
 		if (cache)
@@ -91,18 +90,19 @@ module.exports = class Soundcloud2Podcast {
 		return this.generate_feed(sc).xml(true);
 	}
 
-	generate_feed(sc){
+	generate_feed(sc) {
 		let feed = this.generate_basic_feed(sc);
 		let tracks = sc.kind == 'user' ? this.getSoundcloudJson(sc.permalink_url + "/tracks") : sc.tracks;
 
 		feed = this.add_items_to_feed(feed, tracks);
 
-		this.save_cache(feed);
+		//this.save_cache(feed);
+		this.save_file(feed);
 
 		return feed;
 	}
 
-	generate_basic_feed(sc){
+	generate_basic_feed(sc) {
 		let options = {
 			title: sc.title ? sc.title : this.user.username,
 			description: sc.description,
@@ -119,11 +119,11 @@ module.exports = class Soundcloud2Podcast {
 		return new rss(options);
 	}
 
-	add_items_to_feed(feed, tracks){
+	add_items_to_feed(feed, tracks) {
 		tracks.sort((track1, track2) => {
-			return strtotime(track2.created_at) - strtotime(track1.created_at);		
+			return strtotime(track2.created_at) - strtotime(track1.created_at);
 		});
-		for (let i = 0; i < tracks.length; i++){
+		for (let i = 0; i < tracks.length; i++) {
 			let track = tracks[i];
 			let download_url = track.download_url ? track.download_url : track.stream_url;
 			feed.item({
@@ -137,49 +137,73 @@ module.exports = class Soundcloud2Podcast {
 					size: track.original_content_size,
 					type: mime.lookup(track.original_format)
 				},
-				custom_elements: [
-					{'itunes:author': this.user.username},
-					{'itunes:image': {
-						_attr: {
-							href: track.artwork_url
+				custom_elements: [{
+						'itunes:author': this.user.username
+					},
+					{
+						'itunes:image': {
+							_attr: {
+								href: track.artwork_url
+							}
 						}
-					}},
+					},
 				]
 			});
 		}
 		return feed;
 	}
 
-	get_cache(){
+	get_cache() {
 		let cache = this.get_cache_path();
-		if (fs.existsSync(cache) &&  strtotime('now') < strtotime(this.cache_time, fs.statSync(cache).mtimeMs*1000)) {
+		if (fs.existsSync(cache) && strtotime('now') < strtotime(this.cache_time, fs.statSync(cache).mtimeMs * 1000)) {
 			return fs.readFileSync(cache);
-		}
-		else
+		} else
 			return false;
 	}
 
-	save_cache(feed){
+	save_cache(feed) {
 		if (!fs.existsSync('cache'))
 			fs.mkdirSync('cache');
 
 		fs.writeFile(this.get_cache_path(), feed.xml(true), () => {});
 	}
 
-	get_cache_path(){
+	save_file(feed) {
+		if (!fs.existsSync('store'))
+			fs.mkdirSync('store');
+
+		fs.writeFile(this.get_save_path(), feed.xml(true), () => {});
+	}
+
+	get_save_path() {
+		let str = this.url;
+		str = str.substring(str.indexOf("sets") + 5);
+		console.log(str);
+		return 'store/' + str + '.xml';
+	}
+
+	get_cache_path() {
 		return 'cache/' + md5(this.url) + '.xml';
 	}
 
-	addChannelImage(options, sc){
+	addChannelImage(options, sc) {
 		let image_url = sc.artwork_url ? sc.artwork_url : this.user.avatar_url;
-		if (image_url){
+		if (image_url) {
 			options.image_url = image_url;
-			options.custom_namespaces = {'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'};
-			options.custom_elements = [{'itunes:image': {_attr: {href: image_url}}}];
+			options.custom_namespaces = {
+				'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'
+			};
+			options.custom_elements = [{
+				'itunes:image': {
+					_attr: {
+						href: image_url
+					}
+				}
+			}];
 		}
 	}
 
-	getLocalClientId(){
+	getLocalClientId() {
 		if (!fs.existsSync(CLIENT_ID_PATH))
 			return this.saveRemoteClientId();
 
@@ -187,7 +211,7 @@ module.exports = class Soundcloud2Podcast {
 		return this.clientId;
 	}
 
-	saveRemoteClientId(){
+	saveRemoteClientId() {
 		let res = request('GET', YOUTUBE_DL_CLIENT_ID_URL);
 		if (res.statusCode != 200)
 			this.die('request to youtube-dl failed!');
@@ -197,30 +221,30 @@ module.exports = class Soundcloud2Podcast {
 
 		if (!matches[1])
 			die('clientid not found!');
-			
+
 		fs.writeFile(CLIENT_ID_PATH, matches[1], () => {});
 		this.clientId = matches[1];
 		return this.clientId;
 	}
 
-	die(message){
+	die(message) {
 		this.res.statusCode = 500;
-		this.res.setHeader('Content-Type', 'text/html');
+		//this.res.setHeader('Content-Type', 'text/html');
 		this.res.send(message);
 		this.res.set("Connection", "close");
 	}
 
-	print(message){
+	print(message) {
 		this.res.set('Content-Type', 'application/rss+xml; charset=utf-8');
 		this.res.send(message);
 		this.res.set("Connection", "close");
 	}
 
-	time(){
+	time() {
 		return Math.floor(new Date() / 1000);
 	}
 
-	get_current_url(){
+	get_current_url() {
 		return this.req.protocol + '://' + this.req.get('host') + this.req.originalUrl;
 	}
 }
