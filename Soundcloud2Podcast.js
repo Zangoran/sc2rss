@@ -6,6 +6,9 @@ let rss = require('rss');
 let mime = require('mime-types')
 let express = require('express');
 
+let authorString = "Two Friends (Clean)";
+let emailString = "no-reply@landquist.us";
+
 const CLIENT_ID_PATH = 'client_id';
 const YOUTUBE_DL_CLIENT_ID_URL = 'https://raw.githubusercontent.com/ytdl-org/youtube-dl/master/youtube_dl/extractor/soundcloud.py';
 
@@ -138,7 +141,10 @@ module.exports = class Soundcloud2Podcast {
 					type: mime.lookup(track.original_format)
 				},
 				custom_elements: [{
-						'itunes:author': this.user.username
+						'itunes:author': authorString
+					},
+					{
+						'itunes:email': emailString
 					},
 					{
 						'itunes:image': {
@@ -178,7 +184,6 @@ module.exports = class Soundcloud2Podcast {
 	get_save_path() {
 		let str = this.url;
 		str = str.substring(str.indexOf("sets") + 5);
-		console.log(str);
 		return 'store/' + str + '.xml';
 	}
 
