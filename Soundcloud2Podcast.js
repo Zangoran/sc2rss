@@ -141,10 +141,10 @@ module.exports = class Soundcloud2Podcast {
 					type: mime.lookup(track.original_format)
 				},
 				custom_elements: [{
-						'itunes:author': authorString
-					},
-					{
-						'itunes:email': emailString
+						'itunes:owner': {
+							'itunes:author': authorString
+						}
+
 					},
 					{
 						'itunes:image': {
