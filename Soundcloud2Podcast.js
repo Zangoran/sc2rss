@@ -16,9 +16,9 @@ module.exports = class Soundcloud2Podcast {
 		this.cache_time;
 
 		let app = express();
-		app.listen(80, () => {
-			console.log('Soundcloud2Podcast app listening on port 80!');
-		});
+		const port = process.env.PORT || 3000;
+
+		app.listen(port, () => console.log(`Listening on ${port}`));
 
 		app.get('/', (req, res) => {
 			this.req = req;
