@@ -1,0 +1,65 @@
+{
+  "_from": "soundcloud2podcast",
+  "_id": "soundcloud2podcast@1.1.1",
+  "_inBundle": false,
+  "_integrity": "sha512-PqDdWXSdY4/PzTPITQH1A/DyCcu3gkGSLm5xw+qFuEbIHmJqGMJ+woR/NuWDX2VX5wXjhLOwehBIk4wvgcUfOA==",
+  "_location": "/soundcloud2podcast",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "soundcloud2podcast",
+    "name": "soundcloud2podcast",
+    "escapedName": "soundcloud2podcast",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/soundcloud2podcast/-/soundcloud2podcast-1.1.1.tgz",
+  "_shasum": "738abd6a50f52a302afac90a1a898b47fddf20da",
+  "_spec": "soundcloud2podcast",
+  "_where": "C:\\Users\\Zach\\Documents\\Projects\\sc2rss",
+  "author": {
+    "name": "Amiad B",
+    "email": "npm@hatul.info",
+    "url": "https://hatul.info"
+  },
+  "bugs": {
+    "url": "https://github.com/amiad/node-soundcloud2podcast/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "express": "^4.16.2",
+    "fs": "^0.0.1-security",
+    "md5": "^2.2.1",
+    "mime-types": "^2.1.17",
+    "rss": "^1.2.2",
+    "strtotime": "^1.0.0",
+    "sync-request": "^5.0.0"
+  },
+  "deprecated": false,
+  "description": "Convert Soundcloud playlist or user to podcast feed",
+  "devDependencies": {},
+  "homepage": "https://github.com/amiad/node-soundcloud2podcast#readme",
+  "keywords": [
+    "soundcloud",
+    "podcast",
+    "rss",
+    "feed"
+  ],
+  "license": "GPL-3.0-or-later",
+  "main": "Soundcloud2Podcast.js",
+  "name": "soundcloud2podcast",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amiad/node-soundcloud2podcast.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.1.1"
+}
